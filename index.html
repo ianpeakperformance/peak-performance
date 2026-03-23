@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peak Performance — Home Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+body{min-height:100vh;background:#080808;font-family:'Barlow Condensed',sans-serif;color:#fff;overflow-x:hidden}
+.header{padding:32px 24px 20px;border-bottom:1px solid #1a1a1a;display:flex;align-items:flex-end;gap:12px}
+.header-label{font-size:11px;letter-spacing:4px;color:#555;font-weight:700;margin-bottom:4px;text-transform:uppercase}
+.header-title{font-size:38px;font-weight:900;letter-spacing:-1px;line-height:1;text-transform:uppercase}
+.header-right{margin-left:auto;text-align:right}
+.header-right .label{font-size:11px;color:#444;letter-spacing:2px;text-transform:uppercase}
+.header-right .value{font-size:14px;font-weight:600;color:#aaa}
+.selector{display:flex;gap:10px;padding:20px 24px;overflow-x:auto;border-bottom:1px solid #111}
+.workout-card{min-width:140px;background:#111;border:2px solid #1e1e1e;border-radius:12px;padding:14px 16px;position:relative;cursor:pointer;transition:all .2s ease}
+.workout-card:hover{transform:translateY(-2px)}
+.workout-card.active{background:var(--c-bg);border-color:var(--c)}
+.wc-dur{font-size:10px;letter-spacing:2px;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.wc-title{font-size:16px;font-weight:900;text-transform:uppercase;line-height:1.1;margin-bottom:6px}
+.wc-sub{font-size:10px;color:#555;font-weight:500}
+.wc-tag{position:absolute;top:10px;right:10px;border-radius:4px;padding:1px 6px;font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.main{padding:24px}
+.workout-header{border-radius:16px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden}
+.wh-circle{position:absolute;right:-20px;top:-20px;width:160px;height:160px;border-radius:50%}
+.wh-tag{font-size:11px;letter-spacing:4px;font-weight:700;text-transform:uppercase;margin-bottom:6px}
+.wh-title{font-size:44px;font-weight:900;letter-spacing:-1px;text-transform:uppercase;line-height:1}
+.wh-sub{font-size:16px;color:#888;font-weight:500;margin-top:4px;margin-bottom:16px}
+.wh-meta{display:flex;gap:16px}
+.wh-meta .label{font-size:9px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+.wh-meta .value{font-size:13px;font-weight:700;color:#ddd}
+.phases{display:flex;flex-direction:column;gap:10px}
+.phase{background:#0f0f0f;border:1px solid #1a1a1a;border-radius:12px;overflow:hidden;transition:border-color .2s}
+.phase.open{border-color:var(--c-border)}
+.phase-row{padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s ease}
+.phase-row:hover{background:rgba(255,255,255,.03)}
+.phase-icon{font-size:22px}
+.phase-name{font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.phase-note{font-size:11px;font-weight:600;margin-top:2px}
+.phase-time{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.phase-arrow{font-size:18px;transition:transform .2s}
+.phase.open .phase-arrow{transform:rotate(180deg)}
+.exercises{border-top:1px solid #1a1a1a;display:none}
+.phase.open .exercises{display:block}
+.ex-row{padding:12px 20px 12px 58px;display:flex;align-items:center;border-bottom:1px solid #161616;gap:12px;animation:slideIn .2s ease forwards;opacity:0}
+.ex-row:last-child{border-bottom:none}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.ex-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;flex-shrink:0}
+.ex-name{font-size:14px;font-weight:700}
+.ex-note{font-size:11px;color:#555;margin-top:1px}
+.ex-reps{font-size:11px;font-weight:700;color:#888;text-align:right;min-width:80px;letter-spacing:.5px}
+.tip{margin-top:24px;padding:16px 20px;background:#0f0f0f;border:1px solid #1a1a1a;border-radius:12px;display:flex;gap:12px;align-items:flex-start}
+.tip-icon{font-size:18px}
+.tip-label{font-size:12px;font-weight:700;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.tip-text{font-size:13px;color:#777;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-label">Home Training</div>
+    <div class="header-title">Workout<br><span id="headerAccent">Plans</span></div>
+  </div>
+  <div class="header-right">
+    <div class="label">Equipment</div>
+    <div class="value">Light Dumbbells Only</div>
+  </div>
+</div>
+
+<div class="selector" id="selector"></div>
+
+<div class="main">
+  <div class="workout-header" id="workoutHeader">
+    <div class="wh-circle" id="whCircle"></div>
+    <div class="wh-tag" id="whTag"></div>
+    <div class="wh-title" id="whTitle"></div>
+    <div class="wh-sub" id="whSub"></div>
+    <div class="wh-meta" id="whMeta"></div>
+  </div>
+  <div class="phases" id="phases"></div>
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <div>
+      <div class="tip-label">Coach's Tip</div>
+      <div class="tip-text">Keep dumbbells light enough to maintain form at high intensity. Focus on <span id="tipAccent" style="font-weight:700">explosive power</span> and clean movement — not just getting through the reps.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const workouts=[{id:1,title:"IRON SWEAT",subtitle:"30-Min Dumbbell HIIT",duration:"30 MIN",level:"Intermediate",equipment:"Light Dumbbells",tag:"HIIT",color:"#FF4D00",bg:"#0D0D0D",phases:[{name:"WARM-UP",time:"5 min",icon:"🔥",exercises:[{name:"Jumping Jacks",reps:"30 sec",note:"Arms wide"},{name:"Hip Circles",reps:"30 sec each side",note:"Loosen hips"},{name:"Arm Swings",reps:"30 sec",note:"Cross-body"},{name:"High Knees",reps:"45 sec",note:"Pump arms"},{name:"Shoulder Rolls + Chest Openers",reps:"1 min",note:"Slow & controlled"}]},{name:"BLOCK 1 — HIIT CIRCUIT",time:"12 min",icon:"⚡",note:"4 rounds · 30 sec ON / 10 sec REST",exercises:[{name:"Dumbbell Squat Jumps",reps:"30 sec",note:"Hold DBs at sides"},{name:"Renegade Row Push-Up",reps:"30 sec",note:"Alternate rows"},{name:"DB Swing (Kettlebell-style)",reps:"30 sec",note:"Hip hinge power"},{name:"Lateral Shuffle + DB Curl",reps:"30 sec",note:"3 shuffles, 1 curl"}]},{name:"BLOCK 2 — BODYWEIGHT BLAST",time:"8 min",icon:"💥",note:"2 rounds · 40 sec ON / 20 sec REST",exercises:[{name:"Burpee to Tuck Jump",reps:"40 sec",note:"No DBs needed"},{name:"Push-Up to T-Rotation",reps:"40 sec",note:"Alternate sides"},{name:"Mountain Climbers",reps:"40 sec",note:"Drive knees hard"},{name:"Plyo Lunge",reps:"40 sec",note:"Switch in air"}]},{name:"COOL-DOWN",time:"5 min",icon:"🧊",exercises:[{name:"Child's Pose",reps:"1 min",note:"Breathe deep"},{name:"Standing Quad Stretch",reps:"30 sec each",note:"Balance focus"},{name:"Pigeon Pose",reps:"1 min each",note:"Hip flexors"},{name:"Chest Doorframe Stretch",reps:"1 min",note:"Open chest"}]}]},{id:2,title:"FAST BURN",subtitle:"30-Min CrossFit-Style",duration:"30 MIN",level:"Beginner–Int.",equipment:"Light Dumbbells",tag:"CROSSFIT",color:"#00D4FF",bg:"#050F1A",phases:[{name:"WARM-UP",time:"5 min",icon:"🔥",exercises:[{name:"Inchworm Walk-Out",reps:"5 reps",note:"Slow, controlled"},{name:"Leg Swings",reps:"10 each side",note:"Front/back & lateral"},{name:"World's Greatest Stretch",reps:"5 each side",note:"Thoracic rotation"},{name:"DB Deadlift (light)",reps:"10 reps",note:"Warm the hinge"}]},{name:"AMRAP — 12 MINUTES",time:"12 min",icon:"⚡",note:"As Many Rounds As Possible · Rest only when needed",exercises:[{name:"10 DB Thrusters",reps:"10 reps",note:"Squat + press"},{name:"10 DB Romanian Deadlifts",reps:"10 reps",note:"Slow & squeeze"},{name:"10 Push-Ups",reps:"10 reps",note:"Full range"},{name:"200m Sprint in Place",reps:"30 sec",note:"All-out effort"}]},{name:"FOR TIME — FINISHER",time:"8 min",icon:"🏁",note:"3 Rounds · Log your time",exercises:[{name:"15 DB Goblet Squats",reps:"15 reps",note:"Hold 1 DB at chest"},{name:"12 DB Bent-Over Rows",reps:"12 reps",note:"Both arms"},{name:"10 Jump Squats",reps:"10 reps",note:"No DBs"},{name:"5 Burpees",reps:"5 reps",note:"Full extension"}]},{name:"COOL-DOWN",time:"5 min",icon:"🧊",exercises:[{name:"Cat-Cow Breathing",reps:"1 min",note:"Spine mobility"},{name:"Seated Hamstring Stretch",reps:"1 min each",note:"Reach for toes"},{name:"90/90 Hip Stretch",reps:"1 min each",note:"Rotate front to back"},{name:"Diaphragmatic Breathing",reps:"1 min",note:"Reset nervous system"}]}]},{id:3,title:"GRIND SESSION",subtitle:"45-Min HIIT + Run Hybrid",duration:"45 MIN",level:"Intermediate",equipment:"Light Dumbbells + Running",tag:"HIIT + RUN",color:"#FFD600",bg:"#0A0A00",phases:[{name:"WARM-UP",time:"5 min",icon:"🔥",exercises:[{name:"Dynamic Walking Lunges",reps:"10 each side",note:"Add arm reach"},{name:"Lateral Band Walk / Lateral Shuffle",reps:"30 sec each way",note:"Activate glutes"},{name:"Arm Circles + Shoulder Mobility",reps:"1 min",note:"Small to large"},{name:"Light Jog in Place",reps:"1 min",note:"Build heart rate"}]},{name:"RUN INTERVAL 1",time:"5 min",icon:"🏃",note:"Outside or treadmill · Moderate pace (Zone 2–3)",exercises:[{name:"Steady Run",reps:"5 min",note:"Conversational effort"}]},{name:"HIIT BLOCK 1",time:"10 min",icon:"⚡",note:"40 sec ON / 20 sec REST · 3 rounds",exercises:[{name:"DB Snatch (alternating)",reps:"40 sec",note:"Explosive hips"},{name:"Push-Up Burpee",reps:"40 sec",note:"Full push-up at bottom"},{name:"DB Lateral Lunge + Curl",reps:"40 sec",note:"Alternate sides"},{name:"Tuck Jumps",reps:"40 sec",note:"Drive knees to chest"}]},{name:"RUN INTERVAL 2",time:"5 min",icon:"🏃",note:"Push the pace — Zone 3–4",exercises:[{name:"Tempo Run",reps:"5 min",note:"Uncomfortable but sustainable"}]},{name:"HIIT BLOCK 2",time:"10 min",icon:"💥",note:"45 sec ON / 15 sec REST · 3 rounds",exercises:[{name:"DB Clean + Press",reps:"45 sec",note:"Power from hips"},{name:"V-Up + DB Pass",reps:"45 sec",note:"Pass DB feet to hands"},{name:"Squat Jump + DB Overhead Hold",reps:"45 sec",note:"Arms locked out"},{name:"Plank DB Drag",reps:"45 sec",note:"Cross-body drag"}]},{name:"COOL-DOWN",time:"5 min",icon:"🧊",exercises:[{name:"Walking Cool-Down",reps:"1 min",note:"Lower heart rate"},{name:"Standing IT Band Stretch",reps:"45 sec each",note:"Runners essential"},{name:"Hip Flexor Kneeling Lunge",reps:"1 min each",note:"Deep psoas stretch"},{name:"Supine Spinal Twist",reps:"45 sec each",note:"Release back tension"}]}]},{id:4,title:"THE CRUSHER",subtitle:"50-Min Full Body HIIT",duration:"50 MIN",level:"Advanced",equipment:"Light Dumbbells",tag:"HIIT",color:"#FF006E",bg:"#0D000A",phases:[{name:"WARM-UP",time:"7 min",icon:"🔥",exercises:[{name:"Foam Roll / Floor Mobility",reps:"2 min",note:"Quads, lats, thoracic"},{name:"Jumping Jacks",reps:"1 min",note:"Build blood flow"},{name:"Squat to Stand",reps:"10 reps",note:"Hamstring + hip opener"},{name:"Bear Crawl Forward / Backward",reps:"30 sec each",note:"Prime shoulders"},{name:"DB Deadlift Warm-Up",reps:"12 reps light",note:"Groove the hinge"}]},{name:"BLOCK A — LOWER BODY POWER",time:"12 min",icon:"⚡",note:"EMOM (Every Minute on the Minute) · 12 rounds",exercises:[{name:"Odd mins: 10 DB Jump Squats",reps:"10 reps",note:"Light DBs at sides"},{name:"Even mins: 12 DB Reverse Lunges",reps:"12 reps",note:"6 each leg"}]},{name:"BLOCK B — UPPER BODY BURN",time:"10 min",icon:"💪",note:"3 rounds · 40 sec ON / 20 sec REST",exercises:[{name:"DB Arnold Press",reps:"40 sec",note:"Rotate palms in to out"},{name:"Renegade Row",reps:"40 sec",note:"Tight plank, alternate"},{name:"DB Chest Fly on Floor",reps:"40 sec",note:"Slow eccentric"},{name:"Tricep Push-Up + DB Kickback",reps:"40 sec",note:"Combo move"}]},{name:"BLOCK C — METABOLIC FINISHER",time:"12 min",icon:"🏁",note:"4 rounds · 35 sec ON / 10 sec REST",exercises:[{name:"DB Hang Power Clean",reps:"35 sec",note:"Hip drive = power"},{name:"Lateral Burpee Over DB",reps:"35 sec",note:"Jump laterally over DB"},{name:"DB Russian Twist",reps:"35 sec",note:"Feet elevated"},{name:"Sprint in Place",reps:"35 sec",note:"ALL OUT"}]},{name:"COOL-DOWN",time:"9 min",icon:"🧊",exercises:[{name:"Full Body Floor Stretch Flow",reps:"3 min",note:"Child's pose, cobra, seated fold"},{name:"Figure-4 Glute Stretch",reps:"1 min each",note:"Supine"},{name:"Doorframe Chest Stretch",reps:"1 min",note:"Open the pec minor"},{name:"Legs-Up-the-Wall",reps:"2 min",note:"Flush legs, parasympathetic reset"}]}]},{id:5,title:"LONG GAME",subtitle:"50-Min CrossFit Endurance",duration:"50 MIN",level:"Intermediate–Adv.",equipment:"Light Dumbbells",tag:"CROSSFIT",color:"#00FF94",bg:"#000D07",phases:[{name:"WARM-UP",time:"7 min",icon:"🔥",exercises:[{name:"Jump Rope / Jump Rope Sim",reps:"2 min",note:"Use imaginary rope"},{name:"PVC / Broomstick Pass-Throughs",reps:"10 reps",note:"Shoulder mobility"},{name:"Good Mornings (bodyweight)",reps:"12 reps",note:"Hip hinge pattern"},{name:"Air Squat + Overhead Reach",reps:"10 reps",note:"Ankle + thoracic"},{name:"DB Deadlift Build-Up",reps:"3x8 ascending",note:"Gradually increase effort"}]},{name:"PART 1 — CHIPPER",time:"15 min",icon:"⚡",note:"Complete each set once, in order, for time",exercises:[{name:"50 Jumping Jacks",reps:"50 reps",note:"Fast & rhythmic"},{name:"40 DB Goblet Squats",reps:"40 reps",note:"1 DB at chest"},{name:"30 Push-Ups",reps:"30 reps",note:"Modify on knees if needed"},{name:"20 DB Deadlifts",reps:"20 reps",note:"Both DBs"},{name:"10 Burpee + Broad Jump",reps:"10 reps",note:"Land soft, jump forward"}]},{name:"PART 2 — STRENGTH COMPLEX",time:"15 min",icon:"💪",note:"5 rounds, rest 90 sec between rounds",exercises:[{name:"5 DB Hang Cleans",reps:"5 reps",note:"Explosive pull"},{name:"5 DB Front Squats",reps:"5 reps",note:"DBs on shoulders"},{name:"5 DB Push Press",reps:"5 reps",note:"Dip & drive"},{name:"10 DB Romanian Deadlifts",reps:"10 reps",note:"Slow & long"}]},{name:"PART 3 — CORE CASH-OUT",time:"5 min",icon:"🔩",note:"2 rounds · No rest between exercises",exercises:[{name:"DB Suitcase March (in place)",reps:"30 sec each side",note:"Anti-lateral flexion"},{name:"Hollow Body Hold",reps:"30 sec",note:"Lower back flat"},{name:"DB Windmill",reps:"8 reps each side",note:"Light DB overhead"},{name:"Dead Bug + DB Chest Press",reps:"10 reps",note:"Combo stability"}]},{name:"COOL-DOWN",time:"8 min",icon:"🧊",exercises:[{name:"Slow Walk / March in Place",reps:"1 min",note:"Bring HR down"},{name:"Downward Dog Flow",reps:"2 min",note:"Pedal heels"},{name:"Pigeon Pose",reps:"1 min each",note:"Hip opener"},{name:"Seated Spinal Twist",reps:"45 sec each",note:"Full rotation"},{name:"Savasana / Box Breathing",reps:"2 min",note:"4-4-4-4 breath pattern"}]}]}];
+
+let active=0;
+let expandedPhase=null;
+
+function render(){
+  const w=workouts[active];
+  document.getElementById('headerAccent').style.color=w.color;
+  
+  // Selector
+  const sel=document.getElementById('selector');
+  sel.innerHTML='';
+  workouts.forEach((wk,i)=>{
+    const d=document.createElement('div');
+    d.className='workout-card'+(i===active?' active':'');
+    if(i===active){d.style.cssText=`--c:${wk.color};--c-bg:${wk.color}18;background:${wk.color}18;border-color:${wk.color}`}
+    d.innerHTML=`<div class="wc-dur" style="color:${wk.color}">${wk.duration}</div><div class="wc-title">${wk.title}</div><div class="wc-sub">${wk.subtitle}</div><div class="wc-tag" style="background:${wk.color}22;color:${wk.color}">${wk.tag}</div>`;
+    d.onclick=()=>{active=i;expandedPhase=null;render()};
+    sel.appendChild(d);
+  });
+
+  // Workout Header
+  const wh=document.getElementById('workoutHeader');
+  wh.style.background=`linear-gradient(135deg,${w.color}22 0%,${w.bg} 60%)`;
+  wh.style.border=`1px solid ${w.color}33`;
+  document.getElementById('whCircle').style.cssText=`position:absolute;right:-20px;top:-20px;width:160px;height:160px;border-radius:50%;background:${w.color}0a;border:1px solid ${w.color}15`;
+  document.getElementById('whTag').style.color=w.color;
+  document.getElementById('whTag').textContent=`${w.tag} · ${w.duration}`;
+  document.getElementById('whTitle').textContent=w.title;
+  document.getElementById('whSub').textContent=w.subtitle;
+  document.getElementById('whMeta').innerHTML=[['Level',w.level],['Equipment',w.equipment],['Phases',w.phases.length+' phases']].map(([k,v])=>`<div><div class="label">${k}</div><div class="value">${v}</div></div>`).join('');
+
+  // Phases
+  const ph=document.getElementById('phases');
+  ph.innerHTML='';
+  w.phases.forEach((phase,pi)=>{
+    const isOpen=expandedPhase===pi;
+    const div=document.createElement('div');
+    div.className='phase'+(isOpen?' open':'');
+    div.style.cssText=`--c-border:${w.color}55`;
+    
+    let exHTML='';
+    if(isOpen){
+      exHTML='<div class="exercises">'+phase.exercises.map((ex,ei)=>`<div class="ex-row" style="animation-delay:${ei*0.04}s"><div class="ex-num" style="border:2px solid ${w.color}44;color:${w.color}">${ei+1}</div><div style="flex:1"><div class="ex-name">${ex.name}</div>${ex.note?`<div class="ex-note">${ex.note}</div>`:''}</div><div class="ex-reps">${ex.reps}</div></div>`).join('')+'</div>';
+    }
+    
+    div.innerHTML=`<div class="phase-row"><div class="phase-icon">${phase.icon}</div><div style="flex:1"><div class="phase-name">${phase.name}</div>${phase.note?`<div class="phase-note" style="color:${w.color}">${phase.note}</div>`:''}</div><div class="phase-time" style="background:${w.color}22;color:${w.color}">${phase.time}</div><div class="phase-arrow" style="color:${isOpen?w.color:'#444'}">▾</div></div>${exHTML}`;
+    
+    div.querySelector('.phase-row').onclick=()=>{expandedPhase=isOpen?null:pi;render()};
+    ph.appendChild(div);
+  });
+
+  // Tip accent
+  document.getElementById('tipAccent').style.color=w.color;
+}
+
+render();
+</script>
+</body>
+</html>
